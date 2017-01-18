@@ -1,0 +1,35 @@
+#title {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 50px;
+	text-align: center;
+}
+
+#body-style {
+	font-family: 'Catamaran', sans-serif;
+}
+#sign-form {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#user-signin {
+	background-color: #8B8B8B;
+	margin-top: 40px;
+	margin-bottom: 40px;
+	padding: 20px;
+}
+
+.mood-icons {
+	width: 70px;
+}
+
+.moods-selector {
+	text-align: center;
+	width: 90%;
+	margin-bottom: 50px;
+}
+
+.moods {
+	margin-left: auto;
+	margin-right: auto;
+}
