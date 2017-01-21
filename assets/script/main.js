@@ -64,6 +64,59 @@ var moodList = ["party", "romantic", "relax", "cry"];
 var moodSelected, drinkSelected;
 var nameOnSrc;
 
+var activeDiv;
+var inactiveDiv;
+var newDiv;
+
+//Audio api variables
+var player = document.querySelector("audio");
+var songs = [];
+var count = songs.length;
+
+function getSong(mood) {
+    var format = "json";
+    var moodName = mood;
+    var client_id = "56d30c95"; // FIXME Change this when you get the key
+
+    $.ajax({
+            url: "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=" + client_id + "&format=json&limit=5&name=" + moodName,
+            method: 'GET'
+        })
+        .done(function(response) {
+            var data = response.results[0];
+            var tracks = data.tracks;
+
+            //blow away old songs
+            songs = [];
+
+            for (t in tracks) {
+                songs.push(tracks[t].audio);
+            }
+            // console.log(data, tracks);
+            console.log(songs);
+            playSong(songs[0]);
+        });
+}
+
+function playSong(song) {
+    player.setAttribute("src", song);
+    player.play();
+}
+
+function stopSong() {
+    player.pause()
+}
+
+function nextSong() {
+    count += 1;
+    if (count > songs.length) {
+        count = 0;
+    }
+    let next = songs[count];
+    console.log(next);
+    playSong(next);
+    console.log(count);
+}
 
 function loadList() {
     console.log("Hello");
@@ -81,29 +134,61 @@ function loadList() {
 
     .done(function(response) {
         console.log(response);
+        activeDiv = $("<div>");
+        activeDiv.addClass("item active");
+        $(".carousel-inner").append(activeDiv);
+
+        inactiveDiv = $("<div>");
+        inactiveDiv.addClass("item");
+        $(".carousel-inner").append(inactiveDiv);
+
         for (var i = 0; i < 5; i++) {
             var name = response.result[i].name;
-            var newDiv = $("<div>");
+            newDiv = $("<div>");
             // newDiv.addClass("col-md-2 cocktailList");
-            newDiv.addClass("item active");
+            newDiv.addClass("item-style cocktailList");
             newDiv.attr("id", "cocktailID");
 
             newDiv.attr("data-drink-name", name);
             newDiv.append("<h3>" + name + "</h3>");
             nameOnSrc = name.replace(/ /g, '-');
             newDiv.attr("data-nameOnSrc", nameOnSrc);
-            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>")
-            $(".carousel-inner").append(newDiv);
+            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            $(activeDiv).append(newDiv);
         }
+
+        for (var i = 5; i < 10; i++) {
+            var name = response.result[i].name;
+            newDiv = $("<div>");
+            // newDiv.addClass("col-md-2 cocktailList");
+            newDiv.addClass("item-style cocktailList");
+            newDiv.attr("id", "cocktailID");
+
+            newDiv.attr("data-drink-name", name);
+            newDiv.append("<h3>" + name + "</h3>");
+            nameOnSrc = name.replace(/ /g, '-');
+            newDiv.attr("data-nameOnSrc", nameOnSrc);
+            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            $(inactiveDiv).append(newDiv);
+        }
+
     });
+
+    getSong(moodSelected);
 }
+
+$(".carousel-control").on("click", function() {
+    activeDiv.toggleClass(inactiveDiv);
+    inactiveDiv.toggleClass(activeDiv);
+
+});
 
 
 function displayRecipe() {
     console.log("he");
     //$('#myModal').modal('show');
     console.log($(this));
-    jQuery.noConflict();
+    //jQuery.noConflict();
     $("#cocktail-name").html($(this).attr("data-drink-name"));
     $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
     drinkSelected = $(this).attr("data-nameOnSrc");
@@ -136,14 +221,47 @@ function displayRecipe() {
 
 window.onload = function() {
 
-    console.log('onload fired');
+    console.log('hi');
 
     $(document).on("click", ".mood-style", loadList);
-    $(".cocktailList").on("click", function() {
-        displayRecipe();
-    });
 
-    //$(".carousel-inner").on("click", ".cocktailList", displayRecipe);
+    //            $("#cocktailID").on("click",function(){
+    //                displayRecipe();
+    //            });
 
+    $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
 
+    //			 $(".carousel-inner").on("click", ".cocktailList", function(){
+    //				  console.log("he");
+    //        //$('#myModal').modal('show');
+    //        console.log($(this));
+    ////				 jQuery.noConflict();
+    //        $("#cocktail-name").html($(this).attr("data-drink-name"));
+    //        $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
+    //        drinkSelected = $(this).attr("data-nameOnSrc");
+    //
+    //        var queryURL = "https://addb.absolutdrinks.com/drinks/" + drinkSelected.toLowerCase() + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+    //
+    //
+    //        console.log(queryURL);
+    //
+    //        $.ajax({
+    //            url: queryURL,
+    //            method: "GET"
+    //        })
+    //
+    //        .done(function(response) {
+    //				console.log(response);
+    //					var ingredient_list=response.result[0].ingredients;
+    //					console.log(ingredient_list);
+    //
+    //					for (var i = 0; i < ingredient_list.length;i++){
+    //						$(".ingredients-list").append("<p>" + ingredient_list[i].textPlain + "</p>");
+    //					}
+    //
+    //					$("#instructions-area").text(response.result[0].descriptionPlain);
+    //				});
+    //           $("#myModal").modal();
+    ////				 $("#myModal").modal();
+    //        });
 }
