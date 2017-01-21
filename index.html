@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>MoodShaker</title>
+		<!-- CSS link -->
+		<link href="assets/css/style.css" rel="stylesheet" type="text/css">
+		<!-- jQuery link -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<!-- Bootstrap links -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<!-- Google font links -->
+		<link href="https://fonts.googleapis.com/css?family=Catamaran|Ubuntu" rel="stylesheet">
+		<!-- SoundCloud link -->
+		<script src="https://w.soundcloud.com/player/api.js"></script>
+		<script type="text/javascript" src="./assets/script/main.js"></script>
+	</head>
+	<body id="body-style">
+
+			<!-- Parallax Begins -->
+			<div class="parallax">
+				<div class="row" id="title">MoodShaker</div>
+
+				<div class="row" id="sign-form">
+					<div class="col-md-12" id="user-signin">
+						<div class="col-md-4  col-md-offset-2">
+							<form>
+								<div class="form-group">Drinker sign in</div>
+								<div class="form-group">
+									<label for="email">Email address:</label>
+									<input type="email" class="form-control" id="email">
+								</div>
+								<div class="form-group">
+									<label for="pwd">Password:</label>
+									<input type="password" class="form-control" id="pwd">
+								</div>
+								<div class="checkbox">
+									<label><input type="checkbox">Remember me</label>
+								</div>
+								<button type="submit" class="btn btn-default">Submit</button>
+							</form>
+						</div>
+						<div class="col-md-4">
+							<form>
+								<div class="form-group">Drinker sign up</div>
+								<div class="form-group">
+									<label for="name">Your name:</label>
+									<input type="text" class="form-control" id="user-name">
+								</div>
+								<div class="form-group">
+									<label for="email">Email address:</label>
+									<input type="email" class="form-control" id="email-signup">
+								</div>
+								<div class="form-group">
+									<label for="pwd">Password:</label>
+									<input type="password" class="form-control" id="pwd-signup">
+								</div>
+								<button type="submit" class="btn btn-default">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+
+				<!-- Mood Selection -->
+				<div class="row" id="mood-selector">
+					<p>Hi! What do you want to be on the mood for?</p>
+					<div class="moods col-md-12">
+						<div class="mood-style" id="party-mood" data-name="happy">
+							<img src="assets/images/mood1.png" class="mood-icons">
+							<p class="p-style">PARTY</p>
+						</div>
+						<div class="mood-style" id="romance-mood" data-name="Romantic">
+							<img src="assets/images/mood_romance.png" class="mood-icons">
+							<p class="p-style">ROMANCE</p>
+						</div>
+						<div class="mood-style" id="relax-mood">
+							<img src="assets/images/mood_relax.png" class="mood-icons">
+							<p class="p-style">RELAX</p>
+						</div>
+						<div class="mood-style" id="cry-mood">
+							<img src="assets/images/mood_cry.png" class="mood-icons">
+							<p class="p-style">CRY</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- carousal begins -->
+			<div class="row">
+            <div class="col-md-12">
+              <div class="carousel slide multi-item-carousel" id="theCarousel">
+                <div class="carousel-inner" role="listbox">
+                  <div class="item active">
+
+                  </div>
+                  <!-- add  more items here -->
+                  <!-- Example item start:  -->
+
+                  <div class="item">
+                    <div class="col-xs-4"><a href="#1"><!-- <img src="http://placehold.it/300/8bc34a/000000" class="img-responsive"> -->
+                    </a></div>
+                  </div>
+
+
+                  <!--  Example item end -->
+                </div>
+                <a class="left carousel-control" href="#theCarousel" data-slide="prev"><i class="glyphicon glyphicon-chevron-left"></i></a>
+                <a class="right carousel-control" href="#theCarousel" data-slide="next"><i class="glyphicon glyphicon-chevron-right"></i></a>
+              </div>
+           </div>
+     </div>
+
+			<div class="parallax2">
+				<div class="modal-container">
+					<!-- Modal Begins-->
+					<div id="myModal" class="modal fade" role="dialog">
+						<div class="modal-dialog">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title text-center" id="cocktail-name"> </h4>
+								</div>
+								<div class="modal-body">
+									<div class="row">
+										<!-- Image here -->
+										<div class="col-md-6">
+											<img id="image-holder">
+										</div>
+										<!-- Ingridients -->
+										<div class="col-md-6 text-center" id="ingredient-holder">
+											<h3>Ingredients</h3>
+											<ul class="ingredients-list">
+
+											</ul>
+										</div>
+									</div>
+									<!-- Instructions -->
+									<div class="row">
+										<div class="col-md-12" >
+											<h3>Instructions</h3>
+											<p id="instructions-area"></p>
+										</div>
+									</div>
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+	</body>
+</html>
