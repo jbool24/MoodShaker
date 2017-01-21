@@ -9,22 +9,25 @@ var config = {
 // Init db app and create handle
 firebase.initializeApp(config);
 var database = firebase.database();
+var user;
 
 // signInWithPopup
 var provider = new firebase.auth.FacebookAuthProvider();
 // provider.addScope('user_birthday');
 firebase.auth().signInWithPopup(provider).then(function(result) {
     // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-    console.log(result)
+    // console.log(result)
     var token = result.credential.accessToken;
     // The signed-in user info.
-    var user = result.user;
+    user = result.user;
     console.log(user)
-    database.ref("/users").push({
-        user: {
-            email: user.email,
-        },
-    });
+
+    console.log(database.ref("/users").child("email").exists())
+    // if (!) {
+    //   database.ref("/users/" + user.uid).push({ email: user.email, });
+    //   console.log(database.ref().queryOrderedByChild("email"))
+    // }
+
 
 }).catch(function(error) {
     // Handle Errors here.
@@ -34,11 +37,14 @@ firebase.auth().signInWithPopup(provider).then(function(result) {
     var email = error.email;
     // The firebase.auth.AuthCredential type that was used.
     var credential = error.credential;
-    // ...
 });
 
+database.ref("/users").on("value", function(snap){
+  // console.log(user)
+})
+
 firebase.auth().onAuthStateChanged(function(user) {
-    console.log("User in onAuthStateChanged: ", user)
+    // console.log("User in onAuthStateChanged: ", user)
     if (user) {
         $("button#btn-signOut").show();
     } else {
@@ -123,7 +129,7 @@ function loadList() {
 
     moodSelected = $(this).attr("data-name");
 
-    var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+    var queryURL = "https://crossorigin.me/https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
 
     console.log(queryURL);
 
@@ -221,7 +227,7 @@ function displayRecipe() {
 
 window.onload = function() {
 
-    console.log('hi');
+    // console.log('hi');
 
     $(document).on("click", ".mood-style", loadList);
 
