@@ -20,9 +20,10 @@ firebase.auth().signInWithPopup(provider).then(function(result) {
     // The signed-in user info.
     var user = result.user;
     console.log(user)
-    database.ref("/users").set({
-        user: user.email,
-        token: token
+    database.ref("/users").push({
+        user: {
+            email: user.email,
+        },
     });
 
 }).catch(function(error) {
@@ -37,24 +38,27 @@ firebase.auth().signInWithPopup(provider).then(function(result) {
 });
 
 firebase.auth().onAuthStateChanged(function(user) {
-  console.log("User in onAuthStateChanged: ", user)
+    console.log("User in onAuthStateChanged: ", user)
     if (user) {
-        $("button.signOut").hide();
+        $("button#btn-signOut").show();
     } else {
-        $("button.signOut").hide();
+        $("button#btn-signOut").hide();
     }
 });
 
 // SignOut
-$("button.signOut").on("click", function() {
-    console.log("Sign-Out Called")
-        // firebase.auth().signOut().then(function() {
-        //     // Sign-out successful.
-        //     // redirect to splash page to login again
-        // }, function(error) {
-        //     // An error happened.
-        // });
+$(document).ready(function() {
+    $("#btn-signOut").click(function() {
+        console.log("Sign-Out Called");
+        firebase.auth().signOut().then(function() {
+            // Sign-out successful.
+            // redirect to splash page to login again
+        }, function(error) {
+            // An error happened.
+        });
+    });
 });
+
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
 var moodSelected, drinkSelected;
@@ -132,7 +136,7 @@ function displayRecipe() {
 
 window.onload = function() {
 
-    console.log('hi');
+    console.log('onload fired');
 
     $(document).on("click", ".mood-style", loadList);
     $(".cocktailList").on("click", function() {
