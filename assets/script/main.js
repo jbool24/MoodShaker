@@ -59,15 +59,13 @@ $(document).ready(function() {
     });
 });
 
-
-
+// Array of Moods..
 var moodList = ["party", "romantic", "relax", "cry"];
     var moodSelected, drinkSelected;
     var nameOnSrc;
-
-	var activeDiv;
-	var inactiveDiv;
-	var newDiv;
+    var activeDiv;
+    var inactiveDiv;
+    var newDiv;
 
 //Audio api variables
  var player = document.querySelector("audio");
@@ -75,54 +73,57 @@ var moodList = ["party", "romantic", "relax", "cry"];
         var count = songs.length;
 
 function getSong(mood) {
-            var format = "json";
-            var moodName = mood;
-            var client_id = "56d30c95"; // FIXME Change this when you get the key
+    var format = "json";
+    var moodName = mood;
+    var client_id = "56d30c95"; // FIXME Change this when you get the key
 
-            $.ajax({
-                    url: "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=" + client_id + "&format=json&limit=5&name=" + moodName,
-                    method: 'GET'
-                })
-                .done(function(response) {
-                    var data = response.results[0];
-                    var tracks = data.tracks;
+    $.ajax({
+            url: "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=" + client_id + "&format=json&limit=5&name=" + moodName,
+            method: 'GET'
+        })
+        .done(function(response) {
+            var data = response.results[0];
+            var tracks = data.tracks;
 
-                    //blow away old songs
-                    songs = [];
+            //blow away old songs
+            songs = [];
 
-                    for (t in tracks) {
-                        songs.push(tracks[t].audio);
-                    }
-                    // console.log(data, tracks);
-                    console.log(songs);
-                    playSong(songs[0]);
-                });
-        }
-
-        function playSong(song) {
-            player.setAttribute("src", song);
-            player.play();
-        }
-
-        function stopSong() {
-            player.pause()
-        }
-
-        function nextSong() {
-            count += 1;
-            if (count > songs.length) {
-                count = 0;
+            for (t in tracks) {
+                songs.push(tracks[t].audio);
             }
-            let next = songs[count];
-            console.log(next);
-            playSong(next);
-            console.log(count);
+            // console.log(data, tracks);
+            console.log(songs);
+            playSong(songs[0]);
+        });
+}
+
+    function playSong(song) {
+        player.setAttribute("src", song);
+        player.play();
+    }
+
+    function stopSong() {
+        player.pause()
+    }
+
+    function nextSong() {
+        count += 1;
+        if (count > songs.length) {
+            count = 0;
         }
+        let next = songs[count];
+        console.log(next);
+        playSong(next);
+        console.log(count);
+    }
+    //function that loads the list of cocktails as per the moods clicked.. 
     function loadList() {
-		$(activeDiv).empty();
-		$(activeDiv).removeClass("item active");
-		$(inactiveDiv).empty();
-		$(inactiveDiv).removeClass("item active");
+		$("#theCarousel").show();
+			
+        $(activeDiv).empty();
+        $(activeDiv).removeClass("item active");
+        $(inactiveDiv).empty();
+        $(inactiveDiv).removeClass("item active");
         console.log("Hello");
 
         moodSelected = $(this).attr("data-name");
@@ -138,59 +139,61 @@ function getSong(mood) {
 
         .done(function(response) {
             console.log(response);
-			activeDiv = $("<div>");
-			activeDiv.addClass("item active");
-			$(".carousel-inner").append(activeDiv);
-			
-			inactiveDiv = $("<div>");
-			inactiveDiv.addClass("item");
-			$(".carousel-inner").append(inactiveDiv);
-						
-				for (var i = 0; i < 5; i++) {
-					var name = response.result[i].name;
-					newDiv = $("<div>");
-					// newDiv.addClass("col-md-2 cocktailList");
-					newDiv.addClass("item-style cocktailList");
-					newDiv.attr("id", "cocktailID");
+            activeDiv = $("<div>");
+            activeDiv.addClass("item active");
+            $(".carousel-inner").append(activeDiv);
+            
+            inactiveDiv = $("<div>");
+            inactiveDiv.addClass("item");
+            $(".carousel-inner").append(inactiveDiv);
+                        
+                for (var i = 0; i < 5; i++) {
+                    var name = response.result[i].name;
+                    newDiv = $("<div>");
+                    // newDiv.addClass("col-md-2 cocktailList");
+                    newDiv.addClass("item-style cocktailList");
+                    newDiv.attr("id", "cocktailID");
 
-					newDiv.attr("data-drink-name", name);
-					newDiv.append("<p>" + name + "</p>");
-					nameOnSrc = name.replace(/ /g, '-');
-					newDiv.attr("data-nameOnSrc", nameOnSrc);
-					newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-					$(activeDiv).append(newDiv);
-					} 
+                    newDiv.attr("data-drink-name", name);
+                    newDiv.append("<p>" + name + "</p>");
+                    nameOnSrc = name.replace(/ /g, '-');
+                    newDiv.attr("data-nameOnSrc", nameOnSrc);
+                    newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+                    $(activeDiv).append(newDiv);
+                    } 
 
-				for (var i = 5; i < 10; i++) {
-						var name = response.result[i].name;
-						newDiv = $("<div>");
-						// newDiv.addClass("col-md-2 cocktailList");
-						newDiv.addClass("item-style cocktailList");
-						newDiv.attr("id", "cocktailID");
+                for (var i = 5; i < 10; i++) {
+                        var name = response.result[i].name;
+                        newDiv = $("<div>");
+                        // newDiv.addClass("col-md-2 cocktailList");
+                        newDiv.addClass("item-style cocktailList");
+                        newDiv.attr("id", "cocktailID");
 
-						newDiv.attr("data-drink-name", name);
-						newDiv.append("<p>" + name + "</p>");
-						nameOnSrc = name.replace(/ /g, '-');
-						newDiv.attr("data-nameOnSrc", nameOnSrc);
-						newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-						$(inactiveDiv).append(newDiv);
-						} 
+                        newDiv.attr("data-drink-name", name);
+                        newDiv.append("<p>" + name + "</p>");
+                        nameOnSrc = name.replace(/ /g, '-');
+                        newDiv.attr("data-nameOnSrc", nameOnSrc);
+                        newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+                        $(inactiveDiv).append(newDiv);
+                        } 
 
-		});
-		
-		getSong(moodSelected);	
+        });
+        
+        getSong(moodSelected);  
     }
-			
-			$(".carousel-control").on("click", function(){
-				activeDiv.toggleClass(inactiveDiv);
-				inactiveDiv.toggleClass(activeDiv);
-				
-			});		
+            
+            $(".carousel-control").on("click", function(){
+                activeDiv.toggleClass(inactiveDiv);
+                inactiveDiv.toggleClass(activeDiv);
+                
+            });     
 
-
+    // function to display the recipe once a drink is selected..
     function displayRecipe() {
         console.log("he");
         //$('#myModal').modal('show');
+		
+		$(".modal-container").show();
         console.log($(this));
         //jQuery.noConflict();
         $("#cocktail-name").html($(this).attr("data-drink-name"));
@@ -219,21 +222,18 @@ function getSong(mood) {
                 $("#instructions-area").text(response.result[0].descriptionPlain);
             });
             $("#myModal").modal();
-
         }
 
 
         window.onload = function() {
 
             console.log('hi');
-
-            $(document).on("click", ".mood-style", loadList);
 			
-//            $("#cocktailID").on("click",function(){
-//                displayRecipe();
-//            });
+			$("#theCarousel").hide();
+			$(".modal-container").hide();
+            
+			$(document).on("click", ".mood-style", loadList);
 
- $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
-			
-
+            $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
+            
 }
