@@ -1,0 +1,120 @@
+/*body {
+	background-image: url(../images/Amazing-Cocktail-Splash-Wallpapers-HD.jpg);
+}*/
+
+#title {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 50px;
+	text-align: center;
+	color: #af9a51;
+}
+
+#body-style {
+	font-family: 'Catamaran', sans-serif;
+	width: 100%;
+}
+#sign-form {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 80px;
+}
+
+#user-signin {
+	background-color: rgba(225,229,102,0.4);
+	margin-top: 40px;
+	margin-bottom: 40px;
+	padding: 20px;
+}
+
+.mood-icons {
+	width: 80px;
+}
+
+#mood-selector {
+	height: 300px;
+	background: rgba(0, 0, 0, 0.7);
+	text-align: center;
+	width: 90%;
+	margin-bottom: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 25px;
+	color: #af9a51;
+	padding: 30px;
+}
+
+.moods {
+	margin-left: auto;
+	margin-right: auto;
+	font-family: 'Catamaran', sans-serif;
+	font-size: 16px;
+}
+
+.parallax {
+	overflow-x: hidden;
+  	overflow-y: auto;
+    /* The image used */
+    background-image: url(../images/Amazing-Cocktail-Splash-Wallpapers-HD.jpg);
+
+    /* Set a specific height */
+    min-height: 500px; 
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.parallax2 {
+	overflow-x: hidden;
+  	overflow-y: auto;
+    /* The image used */
+    background-image: url(../images/relax-in-mauritius_408.jpeg);
+
+    /* Set a specific height */
+    min-height: 500px; 
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#myCarousel {
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
+
+#party-mood {
+	background-image: url(../images/party_mood.jpg);
+}
+
+#romance-mood {
+	background-image: url(../images/romance_bg.png);
+}
+
+#relax-mood {
+	background-image: url(../images/relax_bg.png);
+}
+
+#cry-mood {
+	background-image: url(../images/cry_bg.png);
+}
+
+.mood-style {
+	box-sizing: border-box;
+	width: 23%;
+	height: 170px;
+	padding: 25px;
+	border: #635215 solid 1px;
+	margin: 1%;
+	float: left;
+}
+
+.p-style {
+	padding: 10px;
+	color: #af9a51;
+}
