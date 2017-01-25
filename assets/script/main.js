@@ -259,11 +259,11 @@ function getSong(mood) {
         moodSelected = $(this).attr("data-name");
 
         var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
-
+		
         console.log(queryURL);
 
         $.ajax({
-            url: queryURL,
+            url: "https://cors-anywhere.herokuapp.com/" + queryURL,
             method: "GET"
         })
 
