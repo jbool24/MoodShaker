@@ -224,8 +224,12 @@ function getSong(mood) {
             $("#myModal").modal();
         }
 
+		$("#carousel-close").click(function() {
+			$("#theCarousel").hide();
+		})
 
-        window.onload = function() {
+
+window.onload = function() {
 
             console.log('hi');
 			
@@ -235,5 +239,4 @@ function getSong(mood) {
 			$(document).on("click", ".mood-style", loadList);
 
             $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
-            
-}
+};

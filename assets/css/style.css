@@ -146,6 +146,7 @@
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+	
 }
 
 .item {
@@ -232,6 +233,21 @@ button.btn.btn-default{
 .close{
 	color: #af9a51;
 	opacity: 1;
+	text-shadow: none;
+	top: 0;
+}
+
+#carousel-close {
+	width: 30px;
+	height: 30px;
+	font-size: 20px;
+	color: #9B913A;
+	padding: auto;
+	border-radius: 10px;
+	border: solid #544A0A;
+	background-color: #544A0A;
+	margin-right: 25px;
+	z-index: 1000;
 }
 
 .carousel {
@@ -244,3 +260,6 @@ button.btn.btn-default{
 	background-color: none;
 }
 
+.carousel-control {
+	
+}
