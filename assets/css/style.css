@@ -7,16 +7,21 @@
 	font-size: 50px;
 	text-align: center;
 	color: #af9a51;
+	margin-left: 27%;
 }
 
 #body-style {
 	font-family: 'Catamaran', sans-serif;
 	width: 100%;
 }
+
 #sign-form {
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 80px;
+	background-color: rgba(225,229,102,0.4);
+	margin-top: 40px;
+	margin-bottom: 40px;
+	padding: 20px;
 }
 
 #user-signin {
@@ -36,6 +41,7 @@
 	text-align: center;
 	width: 90%;
 	margin-bottom: 50px;
+	margin-top: 80px;
 	margin-left: auto;
 	margin-right: auto;
 	font-family: 'Ubuntu', sans-serif;
@@ -58,7 +64,7 @@
     background-image: url(../images/Amazing-Cocktail-Splash-Wallpapers-HD.jpg);
 
     /* Set a specific height */
-    min-height: 500px; 
+    min-height: 500px;
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -74,7 +80,7 @@
     background-image: url(../images/relax-in-mauritius_408.jpeg);
 
     /* Set a specific height */
-    min-height: 500px; 
+    min-height: 500px;
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -112,9 +118,128 @@
 	border: #635215 solid 1px;
 	margin: 1%;
 	float: left;
+	cursor: pointer;
+}
+
+.mood-style:hover {
+    box-shadow: 0px 0px 15px #af9a51;
 }
 
 .p-style {
 	padding: 10px;
 	color: #af9a51;
+}
+
+.item-style {
+	float: left;
+	width: 18%;
+	margin: 1%;
+	height: 300px;
+	border:#92831D solid 1px;
+	background-color: #000000;
+
+}
+
+.carousel-inner {
+	background-color: rgba(175,154,81,0.80);
+	padding: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.item {
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
+	width: 80%;
+	font-family: 'Catamaran', sans-serif;
+	font-size: 18px;
+	color: #af9a51;
+	padding: 10px;
+	cursor: pointer;
+}
+
+p {
+	padding: 8px;
+	height: 20%;
+	text-align: center;
+}
+
+img {
+	width: 90%;
+}
+
+.modal-content{
+	background-color: black;
+	color: #af9a51;
+}
+
+#image-holder {
+	border: solid #af9a51 3px ;
+}
+
+#like-btn {
+	background-color: #af9a51;
+	position: right-fixed;
+	color: black;
+}
+
+.collapse .navbar-collapse {
+	text-align: center;
+	display: inline-block;
+}
+
+.navbar {
+	background: rgba(0, 0, 0, 0.7);
+	padding: 2px;
+    border: none;
+    font-size: 18px;
+	margin: 20px;
+}
+.navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a {
+	color: #af9a51;
+}
+.form-control {
+	background-color: #833636;
+	color: white;
+}
+
+.sign-in-btn {
+	background-color: transparent;
+	color: #af9a51;
+	border-radius: 10px;
+	margin-right: 25px;
+	margin-top: 8px;
+	border: solid #af9a51 1px;
+	font-size: 15px;
+	opacity: 1;
+	position: absolute;
+	right: 0 ;
+}
+
+button.btn.btn-default{
+	background-color: transparent;
+	color: #af9a51;
+	border-radius: 10px;
+	margin-right: 25px;
+	border: solid #af9a51 1px;
+	font-size: 15px;
+	opacity: 1;
+
+}
+
+.close{
+	color: #af9a51;
+	opacity: 1;
+}
+
+.carousel {
+	background-color: none;
+}
+.slide {
+	background-color: none;
+}
+.multi-item-carousel {
+	background-color: none;
 }

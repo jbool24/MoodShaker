@@ -1,3 +1,4 @@
+//================== Database Code =====================
 // Firebase Setup and Initalization
 var config = {
     apiKey: "AIzaSyDoOkqPqY8bu68SFTBAkxof3DTqeyDUHBI",
@@ -9,62 +10,182 @@ var config = {
 // Init db app and create handle
 firebase.initializeApp(config);
 var database = firebase.database();
-var user;
 
-// signInWithPopup
-var provider = new firebase.auth.FacebookAuthProvider();
-// provider.addScope('user_birthday');
-firebase.auth().signInWithPopup(provider).then(function(result) {
-    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-    // console.log(result)
-    var token = result.credential.accessToken;
-    // The signed-in user info.
-    user = result.user;
-    console.log(user)
+var userData; // global handle for authenticated user data
 
-    console.log(database.ref("/users").child("email").exists())
-    // if (!) {
-    //   database.ref("/users/" + user.uid).push({ email: user.email, });
-    //   console.log(database.ref().queryOrderedByChild("email"))
-    // }
+//=============== AUTHENTICATION =========================
+// var provider = ;
+function signIn() {
+    firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).then(function(result) {
+        const user = result.user;
 
+        // console.log("=================")
+        // console.log(firebase.auth().currentUser)
+        // console.log("=================")
+        // console.log(user)
 
-}).catch(function(error) {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // The email of the user's account used.
-    var email = error.email;
-    // The firebase.auth.AuthCredential type that was used.
-    var credential = error.credential;
-});
+        // If user authenticated correctly check if they already have data
+        // in storage otherwise create new userData domain for the user.
+        if (firebase.auth().currentUser !== null) {
+            // console.log(userExists(user.uid))
+            var userRef = database.ref("users/" + user.uid);
+            existingUser(user.uid, function(isexisting) {
 
-database.ref("/users").on("value", function(snap){
-  // console.log(user)
-})
+                if (isexisting) {
+                    console.log(user.uid)
 
-firebase.auth().onAuthStateChanged(function(user) {
-    // console.log("User in onAuthStateChanged: ", user)
+                    //-----update handle to authenticated users data
+                    userRef.once("value").then(function(snap) {
+                        userData = snap.val();
+                    });
+                    //-----update the email address in case email changes
+                    userRef.update({
+                        email: user.email
+                    });
+
+                } else {
+                    // If first time visit create user data domain
+                    console.log("user doesn't exist")
+                    userRef.set({
+                        email: user.email
+                    });
+                }
+            });
+
+        }
+
+    }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        console.log(errorCode, errorMessage, email, credential)
+    }); //======== End Authentication =================
+}
+signIn(); // Call on page load
+
+function signUserOut() {
+
+    console.log("Sign-Out Called");
+
     if (user) {
-        $("button#btn-signOut").show();
+        firebase.auth().signOut()
+            .then(function() {
+                // Sign-out successful.
+                // Reset UserData
+                userData = {};
+
+            }, function(error) {
+                var fullName = firebase.auth().currentUser.displayName;
+                var firstName = fullName.split(" ")
+
+                // An error happened.
+                alert("Logout Unsuccessful")
+                $("button.sign-in-btn").text(firstName[0] + " , sign out?").show();
+            });
+
     } else {
-        $("button#btn-signOut").hide();
+        signIn();
     }
-});
 
-// SignOut
-$(document).ready(function() {
-    $("#btn-signOut").click(function() {
-        console.log("Sign-Out Called");
-        firebase.auth().signOut().then(function() {
-            // Sign-out successful.
-            // redirect to splash page to login again
-        }, function(error) {
-            // An error happened.
+}
+
+function getUserData() {
+    return userData;
+}
+
+function existingUser(userID, callback) {
+
+    var usrRef = database.ref("users/");
+
+    usrRef
+        .child(userID)
+        .once("value")
+        .then(function(snapshot) {
+            var exists = (snapshot.val() !== null);
+            console.log(exists);
+            callback(exists);
+        })
+        .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            console.log(errorCode, errorMessage, email, credential);
+            callback(false);
         });
-    });
-});
 
+};
+
+//==========  Database Functions =====================
+
+
+
+function addUserLike(recipe_id) {
+    var user = firebase.auth().currentUser
+    var likesCollection = database.ref("users/" + user.uid + "/likes")
+    if (user) {
+        likesCollection.push({
+            //GET CURRENT ACTIVE RECIPE ID and add to collection
+            recipe_id: recipe_id //ID GOES HERE; Query name to pass to the absoluteDrinksAPI
+        });
+    }
+
+}
+
+function removeUserLike(like_id) { //----------------------------------------- FIXME
+    var user = firebase.auth().currentUser
+    if (user) {
+        database.ref("users/" + user.uid).child("likes").equalTo(like_id).once("value", function(snap) {
+            snap.ref().remove();
+        }); //ID GOES HERE;
+
+    } else {
+        alert("No user logged in.");
+    }
+}
+
+//TODO Identify Likes and map to cards
+
+//==========  Event Listeners  =======================
+// On Document Ready
+$(document).ready(function() {
+
+    //-- Attach clickListener to signout button
+    $("button.sign-in-btn").on("click", signUserOut);
+
+    //-- Like button clickListene
+    $(document).on("click", "#like-btn", function() {
+        console.log($(this))
+        addUserLike(drinkSelected)
+    });
+
+    //--
+
+    //--
+
+    //-- Watch for user signOut then hide the signout button
+    firebase.auth().onAuthStateChanged(function(user) {
+
+        // console.log("User in onAuthStateChanged: ", user)
+        if (user) {
+            const fullName = firebase.auth().currentUser.displayName;
+            const firstName = fullName.split(" ");
+            $("button.sign-in-btn").text(firstName[0] + ", sign out?").show();
+            // $("button#btn-signOut").show();
+        } else {
+            $("button.sign-in-btn").text("Sign in").show();
+        }
+    });
+
+}); //=================== End Event listenters
+
+//================ End Database Code =================
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
 var moodSelected, drinkSelected;
@@ -129,12 +250,12 @@ function loadList() {
 
     moodSelected = $(this).attr("data-name");
 
-    var queryURL = "https://crossorigin.me/https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+    var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
 
     console.log(queryURL);
 
     $.ajax({
-        url: queryURL,
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
         method: "GET"
     })
 
@@ -205,7 +326,7 @@ function displayRecipe() {
     console.log(queryURL);
 
     $.ajax({
-        url: queryURL,
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
         method: "GET"
     })
 
