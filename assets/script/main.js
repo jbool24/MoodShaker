@@ -336,7 +336,7 @@ function getSong(mood) {
         console.log(queryURL);
 
         $.ajax({
-            url: queryURL,
+            url: "https://cors-anywhere.herokuapp.com/" + queryURL,
             method: "GET"
         })
 
