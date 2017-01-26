@@ -14,14 +14,9 @@ var userData; // global handle for authenticated user data
 
 //=============== AUTHENTICATION =========================
 // var provider = ;
-function signIn() {
+function signUserIn() {
     firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).then(function(result) {
         const user = result.user;
-
-        // console.log("=================")
-        // console.log(firebase.auth().currentUser)
-        // console.log("=================")
-        // console.log(user)
 
         // If user authenticated correctly check if they already have data
         // in storage otherwise create new userData domain for the user.
@@ -31,7 +26,6 @@ function signIn() {
             existingUser(user.uid, function(isexisting) {
 
                 if (isexisting) {
-                    console.log(user.uid)
 
                     //-----update handle to authenticated users data
                     userRef.once("value").then(function(snap) {
@@ -50,9 +44,7 @@ function signIn() {
                     });
                 }
             });
-
         }
-
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -64,17 +56,18 @@ function signIn() {
         console.log(errorCode, errorMessage, email, credential)
     }); //======== End Authentication =================
 }
-signIn(); // Call on page load
+signUserIn(); // Call on page load
 
 function signUserOut() {
 
     console.log("Sign-Out Called");
 
-    if (user) {
+    if (firebase.auth().currentUser !== null) {
         firebase.auth().signOut()
             .then(function() {
                 // Sign-out successful.
-                // Reset UserData
+                // Reset UserData to empty object
+                $("button.sign-in-btn").text("Sign In");
                 userData = {};
 
             }, function(error) {
@@ -83,11 +76,9 @@ function signUserOut() {
 
                 // An error happened.
                 alert("Logout Unsuccessful")
-                $("button.sign-in-btn").text(firstName[0] + " , sign out?").show();
+                $("button.sign-in-btn").text(firstName[0] + " , sign out?");
             });
 
-    } else {
-        signIn();
     }
 
 }
@@ -105,7 +96,6 @@ function existingUser(userID, callback) {
         .once("value")
         .then(function(snapshot) {
             var exists = (snapshot.val() !== null);
-            console.log(exists);
             callback(exists);
         })
         .catch(function(error) {
@@ -156,12 +146,18 @@ function removeUserLike(like_id) { //----------------------------------------- F
 $(document).ready(function() {
 
     //-- Attach clickListener to signout button
-    $("button.sign-in-btn").on("click", signUserOut);
+    $("button.sign-in-btn").on("click", function() {
+        if (firebase.auth().currentUser !== null) {
+            signUserOut();
+        } else {
+            signUserIn();
+        }
+    });
 
     //-- Like button clickListene
     $(document).on("click", "#like-btn", function() {
         console.log($(this))
-        addUserLike(drinkSelected)
+        addUserLike(drinkSelected);
     });
 
     //--
@@ -182,9 +178,10 @@ $(document).ready(function() {
         }
     });
 
-}); //=================== End Event listenters
-
+});
 //================ End Database Code =================
+
+
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
 var moodSelected, drinkSelected;
@@ -227,148 +224,145 @@ function getSong(mood) {
 
 
 
-    function playSong(song) {
-        player.setAttribute("src", song);
-        player.play();
+function playSong(song) {
+    player.setAttribute("src", song);
+    player.play();
+}
+
+function stopSong() {
+    player.pause()
+}
+
+function nextSong() {
+    count += 1;
+    if (count > songs.length) {
+        count = 0;
     }
+    let next = songs[count];
+    console.log(next);
+    playSong(next);
+    console.log(count);
+}
+//function that loads the list of cocktails as per the moods clicked..
+function loadList() {
+    $("#theCarousel").show();
 
-    function stopSong() {
-        player.pause()
-    }
+    $(activeDiv).empty();
+    $(activeDiv).removeClass("item active");
+    $(inactiveDiv).empty();
+    $(inactiveDiv).removeClass("item active");
+    console.log("Hello");
 
-    function nextSong() {
-        count += 1;
-        if (count > songs.length) {
-            count = 0;
-        }
-        let next = songs[count];
-        console.log(next);
-        playSong(next);
-        console.log(count);
-    }
-    //function that loads the list of cocktails as per the moods clicked.. 
-    function loadList() {
-		$("#theCarousel").show();
-			
-        $(activeDiv).empty();
-        $(activeDiv).removeClass("item active");
-        $(inactiveDiv).empty();
-        $(inactiveDiv).removeClass("item active");
-        console.log("Hello");
+    moodSelected = $(this).attr("data-name");
 
-        moodSelected = $(this).attr("data-name");
+    var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
 
-        var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
-		
-        console.log(queryURL);
+    console.log(queryURL);
 
-        $.ajax({
-            url: "https://cors-anywhere.herokuapp.com/" + queryURL,
-            method: "GET"
-        })
+    $.ajax({
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
+        method: "GET"
+    })
 
-        .done(function(response) {
-            console.log(response);
-            activeDiv = $("<div>");
-            activeDiv.addClass("item active");
-            $(".carousel-inner").append(activeDiv);
-            
-            inactiveDiv = $("<div>");
-            inactiveDiv.addClass("item");
-            $(".carousel-inner").append(inactiveDiv);
-                        
-                for (var i = 0; i < 5; i++) {
-                    var name = response.result[i].name;
-                    newDiv = $("<div>");
-                    // newDiv.addClass("col-md-2 cocktailList");
-                    newDiv.addClass("item-style cocktailList");
-                    newDiv.attr("id", "cocktailID");
+    .done(function(response) {
+        console.log(response);
+        activeDiv = $("<div>");
+        activeDiv.addClass("item active");
+        $(".carousel-inner").append(activeDiv);
 
-                    newDiv.attr("data-drink-name", name);
-                    newDiv.append("<p>" + name + "</p>");
-                    nameOnSrc = name.replace(/ /g, '-');
-                    newDiv.attr("data-nameOnSrc", nameOnSrc);
-                    newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-                    $(activeDiv).append(newDiv);
-                    } 
+        inactiveDiv = $("<div>");
+        inactiveDiv.addClass("item");
+        $(".carousel-inner").append(inactiveDiv);
 
-                for (var i = 5; i < 10; i++) {
-                        var name = response.result[i].name;
-                        newDiv = $("<div>");
-                        // newDiv.addClass("col-md-2 cocktailList");
-                        newDiv.addClass("item-style cocktailList");
-                        newDiv.attr("id", "cocktailID");
+        for (var i = 0; i < 5; i++) {
+            var name = response.result[i].name;
+            newDiv = $("<div>");
+            // newDiv.addClass("col-md-2 cocktailList");
+            newDiv.addClass("item-style cocktailList");
+            newDiv.attr("id", "cocktailID");
 
-                        newDiv.attr("data-drink-name", name);
-                        newDiv.append("<p>" + name + "</p>");
-                        nameOnSrc = name.replace(/ /g, '-');
-                        newDiv.attr("data-nameOnSrc", nameOnSrc);
-                        newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-                        $(inactiveDiv).append(newDiv);
-                        } 
-
-        });
-        
-        getSong(moodSelected);  
-    }
-            
-            $(".carousel-control").on("click", function(){
-                activeDiv.toggleClass(inactiveDiv);
-                inactiveDiv.toggleClass(activeDiv);
-                
-            });     
-
-    // function to display the recipe once a drink is selected..
-    function displayRecipe() {
-        console.log("he");
-        //$('#myModal').modal('show');
-		
-		$(".modal-container").show();
-        console.log($(this));
-        //jQuery.noConflict();
-        $("#cocktail-name").html($(this).attr("data-drink-name"));
-        $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
-        drinkSelected = $(this).attr("data-nameOnSrc");
-
-        var queryURL = "https://addb.absolutdrinks.com/drinks/" + drinkSelected.toLowerCase() + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
-
-
-        console.log(queryURL);
-
-        $.ajax({
-            url: "https://cors-anywhere.herokuapp.com/" + queryURL,
-            method: "GET"
-        })
-
-        .done(function(response) {
-            console.log(response);
-                var ingredient_list=response.result[0].ingredients;
-                console.log(ingredient_list);
-
-                for (var i = 0; i < ingredient_list.length;i++){
-                    $(".ingredients-list").append("<p>" + ingredient_list[i].textPlain + "</p>");
-                }
-
-                $("#instructions-area").text(response.result[0].descriptionPlain);
-            });
-            $("#myModal").modal();
+            newDiv.attr("data-drink-name", name);
+            newDiv.append("<p>" + name + "</p>");
+            nameOnSrc = name.replace(/ /g, '-');
+            newDiv.attr("data-nameOnSrc", nameOnSrc);
+            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            $(activeDiv).append(newDiv);
         }
 
-		$("#carousel-close").click(function() {
-			$("#theCarousel").hide();
-		})
+        for (var i = 5; i < 10; i++) {
+            var name = response.result[i].name;
+            newDiv = $("<div>");
+            // newDiv.addClass("col-md-2 cocktailList");
+            newDiv.addClass("item-style cocktailList");
+            newDiv.attr("id", "cocktailID");
+
+            newDiv.attr("data-drink-name", name);
+            newDiv.append("<p>" + name + "</p>");
+            nameOnSrc = name.replace(/ /g, '-');
+            newDiv.attr("data-nameOnSrc", nameOnSrc);
+            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            $(inactiveDiv).append(newDiv);
+        }
+
+    });
+
+    getSong(moodSelected);
+}
+
+$(".carousel-control").on("click", function() {
+    activeDiv.toggleClass(inactiveDiv);
+    inactiveDiv.toggleClass(activeDiv);
+
+});
+
+// function to display the recipe once a drink is selected..
+function displayRecipe() {
+    console.log("he");
+    //$('#myModal').modal('show');
+
+    $(".modal-container").show();
+    console.log($(this));
+    //jQuery.noConflict();
+    $("#cocktail-name").html($(this).attr("data-drink-name"));
+    $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
+    drinkSelected = $(this).attr("data-nameOnSrc");
+
+    var queryURL = "https://addb.absolutdrinks.com/drinks/" + drinkSelected.toLowerCase() + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+
+
+    console.log(queryURL);
+
+    $.ajax({
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
+        method: "GET"
+    })
+
+    .done(function(response) {
+        console.log(response);
+        var ingredient_list = response.result[0].ingredients;
+        console.log(ingredient_list);
+
+        for (var i = 0; i < ingredient_list.length; i++) {
+            $(".ingredients-list").append("<p>" + ingredient_list[i].textPlain + "</p>");
+        }
+
+        $("#instructions-area").text(response.result[0].descriptionPlain);
+    });
+    $("#myModal").modal();
+}
+
+$("#carousel-close").click(function() {
+    $("#theCarousel").hide();
+})
 
 
 
 window.onload = function() {
 
+    console.log('hi');
 
-            console.log('hi');
-			
-			$("#theCarousel").hide();
-			$(".modal-container").hide();
-            
-			$(document).on("click", ".mood-style", loadList);
-
-            $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
+    $(document).on("click", ".mood-style", loadList);
+    $("#theCarousel").hide();
+    $(".modal-container").hide();
+    $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
 };
