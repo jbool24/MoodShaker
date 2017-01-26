@@ -285,7 +285,7 @@ function getSong(mood) {
                     newDiv.attr("id", "cocktailID");
 
                     newDiv.attr("data-drink-name", name);
-                    newDiv.append("<p>" + name + "</p>");
+                    newDiv.append("<h4>" + name + "</h4>");
                     nameOnSrc = name.replace(/ /g, '-');
                     newDiv.attr("data-nameOnSrc", nameOnSrc);
                     newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
@@ -300,7 +300,7 @@ function getSong(mood) {
                         newDiv.attr("id", "cocktailID");
 
                         newDiv.attr("data-drink-name", name);
-                        newDiv.append("<p>" + name + "</p>");
+                        newDiv.append("<h4>" + name + "</h4>");
                         nameOnSrc = name.replace(/ /g, '-');
                         newDiv.attr("data-nameOnSrc", nameOnSrc);
                         newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
