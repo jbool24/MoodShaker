@@ -18,21 +18,14 @@ function signIn() {
     firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).then(function(result) {
         const user = result.user;
 
-        // console.log("=================")
-        // console.log(firebase.auth().currentUser)
-        // console.log("=================")
-        // console.log(user)
-
         // If user authenticated correctly check if they already have data
         // in storage otherwise create new userData domain for the user.
         if (firebase.auth().currentUser !== null) {
-            // console.log(userExists(user.uid))
+
             var userRef = database.ref("users/" + user.uid);
             existingUser(user.uid, function(isexisting) {
 
                 if (isexisting) {
-                    console.log(user.uid)
-
                     //-----update handle to authenticated users data
                     userRef.once("value").then(function(snap) {
                         userData = snap.val();
@@ -52,7 +45,7 @@ function signIn() {
             });
 
         }
-
+        displayFavList();
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -67,9 +60,6 @@ function signIn() {
 signIn(); // Call on page load
 
 function signUserOut() {
-
-    console.log("Sign-Out Called");
-
     if (user) {
         firebase.auth().signOut()
             .then(function() {
@@ -123,8 +113,6 @@ function existingUser(userID, callback) {
 
 //==========  Database Functions =====================
 
-
-
 function addUserLike(recipe_id) {
     var user = firebase.auth().currentUser
     var likesCollection = database.ref("users/" + user.uid + "/likes")
@@ -137,12 +125,12 @@ function addUserLike(recipe_id) {
 
 }
 
-function removeUserLike(like_id) { //----------------------------------------- FIXME
+function removeUserLike(like_id) {
     var user = firebase.auth().currentUser
     if (user) {
         database.ref("users/" + user.uid).child("likes").equalTo(like_id).once("value", function(snap) {
             snap.ref().remove();
-        }); //ID GOES HERE;
+        });
 
     } else {
         alert("No user logged in.");
@@ -150,28 +138,20 @@ function removeUserLike(like_id) { //----------------------------------------- F
 }
 
 function displayFavList() {
-    console.log("inside fav list");
     var user = firebase.auth().currentUser;
-    console.log(user);
     var likesCollection = database.ref("users/" + user.uid + "/likes");
     if (user) {
         database.ref("users/" + user.uid).child("likes").on("child_added", function(snap) {
-            console.log(snap.val().recipe_id);
-            //<li><a href="#">HTML</a></li>
             var newLiItem = $("<li>");
-            var newDiv = $("<div>");
-            newDiv.addClass("favListItem");
+            var newDiv = $("<a>");
+            newDiv.addClass("favListItem favorite-cocktails");
             newDiv.attr("data-nameOnSrc", snap.val().recipe_id);
             newDiv.attr("data-drink-name", snap.val().recipe_id.replace(/-/g, " "));
-            newDiv.text(snap.val().recipe_id.replace(/-/g, " "));
+            newDiv.html("<h5 style='display:inline-block;'>" + snap.val().recipe_id.replace(/-/g, " ") + "</h5><p class='btn-delete'> X </p>");
             newLiItem.append(newDiv);
-            $(".dropdown-menu").append(newLiItem);
-
-        }); //ID GOES HERE;
-
+            $(".dropdown-menu").append(newLiItem)
+        });
     }
-
-
 }
 
 //TODO Identify Likes and map to cards
@@ -179,7 +159,6 @@ function displayFavList() {
 //==========  Event Listeners  =======================
 // On Document Ready
 $(document).ready(function() {
-
     //-- Attach clickListener to signout button
     $("button.sign-in-btn").on("click", signUserOut);
 
@@ -189,14 +168,8 @@ $(document).ready(function() {
         addUserLike(drinkSelected)
     });
 
-    //--
-
-    //--
-
     //-- Watch for user signOut then hide the signout button
     firebase.auth().onAuthStateChanged(function(user) {
-
-        // console.log("User in onAuthStateChanged: ", user)
         if (user) {
             const fullName = firebase.auth().currentUser.displayName;
             const firstName = fullName.split(" ");
@@ -212,6 +185,7 @@ $(document).ready(function() {
 //================ End Database Code =================
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
+var alcoholList = ["Rum", "Vodka", "Whisky", "Gin", "Brandy", "Tequila"];
 var moodSelected, drinkSelected;
 var nameOnSrc;
 
@@ -228,7 +202,7 @@ var count = songs.length;
 function getSong(mood) {
     var format = "json";
     var moodName = mood;
-    var client_id = "56d30c95"; // FIXME Change this when you get the key
+    var client_id = "56d30c95";
 
     $.ajax({
             url: "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=" + client_id + "&format=json&limit=5&name=" + moodName,
@@ -244,7 +218,7 @@ function getSong(mood) {
             for (t in tracks) {
                 songs.push(tracks[t].audio);
             }
-            // console.log(data, tracks);
+
             console.log(songs);
             playSong(songs[0]);
         });
@@ -279,13 +253,109 @@ function loadList() {
     $(activeDiv).removeClass("item active");
     $(inactiveDiv).empty();
     $(inactiveDiv).removeClass("item active");
-    console.log("Hello");
-
     moodSelected = $(this).attr("data-name");
 
     var queryURL = "https://addb.absolutdrinks.com/drinks/tagged/" + moodSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+    $.ajax({
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
+        method: "GET"
+    }).done(function(response) {
+        activeDiv = $("<div>");
+        activeDiv.addClass("item active");
+        $(".carousel-inner").append(activeDiv);
 
-    console.log(queryURL);
+        inactiveDiv = $("<div>");
+        inactiveDiv.addClass("item");
+        $(".carousel-inner").append(inactiveDiv);
+
+        for (var i = 0; i < 10; i++) {
+            var name = response.result[i].name;
+            newDiv = $("<div>");
+            newDiv.addClass("item-style cocktailList");
+            newDiv.attr("id", "cocktailID");
+            newDiv.attr("data-drink-name", name);
+            newDiv.append("<h4>" + name + "</h4>");
+            nameOnSrc = name.replace(/ /g, '-');
+            newDiv.attr("data-nameOnSrc", nameOnSrc);
+            newDiv.append("<img src=https://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            if (i > 4) {
+                $(inactiveDiv).append(newDiv);
+            } else {
+                $(activeDiv).append(newDiv);
+            }
+        }
+    });
+    getSong(moodSelected);
+}
+
+$(".carousel-control").on("click", function() {
+    activeDiv.toggleClass(inactiveDiv);
+    inactiveDiv.toggleClass(activeDiv);
+
+});
+
+// function to display the recipe once a drink is selected..
+function displayRecipe() {
+    $(".modal-container").show();
+    $("#cocktail-name").html($(this).attr("data-drink-name"));
+    $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
+    drinkSelected = $(this).attr("data-nameOnSrc");
+
+    var queryURL = "https://addb.absolutdrinks.com/drinks/" + drinkSelected.toLowerCase() + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
+    $.ajax({
+        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
+        method: "GET"
+    }).done(function(response) {
+        var ingredient_list = response.result[0].ingredients;
+        for (var i = 0; i < ingredient_list.length; i++) {
+            $(".ingredients-list").append("<p>" + ingredient_list[i].textPlain + "</p>");
+        }
+        $("#instructions-area").text(response.result[0].descriptionPlain);
+    });
+
+    //code to hide "add to favorites" button
+   
+    if ($(this).hasClass("favListItem")){
+         $("#like-btn").hide();         
+
+     }
+    $("#myModal").modal();
+}
+
+$("#carousel-close").click(function() {
+    $("#theCarousel").hide();
+})
+
+function fillAlcoholList() {
+    //<li><a href="#">Vodka</a></li>
+    console.log("inside alcohol list");
+    for (var i = 0; i < alcoholList.length; i++) {
+        var newLink = $("<li>");
+
+        newLink.addClass("alcohol");
+
+        newLink.attr("data-name", alcoholList[i].toLowerCase());
+        newLink.text(alcoholList[i].toUpperCase());
+
+        $("#alcohol-list").append(newLink);
+    }
+
+
+}
+
+
+
+
+
+function loadAlcoholList() {
+    $("#theCarousel").show();
+    $(activeDiv).empty();
+    $(activeDiv).removeClass("item active");
+    $(inactiveDiv).empty();
+    $(inactiveDiv).removeClass("item active");
+
+    drinkSelected = $(this).attr("data-name");
+    var queryURL = "https://addb.absolutdrinks.com/drinks/withtype/" + drinkSelected + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
 
     $.ajax({
         url: "https://cors-anywhere.herokuapp.com/" + queryURL,
@@ -293,7 +363,6 @@ function loadList() {
     })
 
     .done(function(response) {
-        console.log(response);
         activeDiv = $("<div>");
         activeDiv.addClass("item active");
         $(".carousel-inner").append(activeDiv);
@@ -311,97 +380,31 @@ function loadList() {
 
             newDiv.attr("data-drink-name", name);
             newDiv.append("<h4>" + name + "</h4>");
-            nameOnSrc = name.replace(/ /g, '-');
+            nameOnSrc = response.result[i].id;
             newDiv.attr("data-nameOnSrc", nameOnSrc);
-            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-            if (i > 4){
+            newDiv.append("<img src=https://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
+            if (i > 4) {
                 $(inactiveDiv).append(newDiv);
             } else {
-                $(activeDiv).append(newDiv);    
+                $(activeDiv).append(newDiv);
             }
-            
         }
-
 
     });
 
-    getSong(moodSelected);
 }
-
-$(".carousel-control").on("click", function() {
-    activeDiv.toggleClass(inactiveDiv);
-    inactiveDiv.toggleClass(activeDiv);
-
-});
-
-// function to display the recipe once a drink is selected..
-function displayRecipe() {
-
-    console.log("inside display recipe")
-    $(".modal-container").show();
-    console.log($(this));
-    //jQuery.noConflict();
-    $("#cocktail-name").html($(this).attr("data-drink-name"));
-    $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
-    drinkSelected = $(this).attr("data-nameOnSrc");
-
-    var queryURL = "https://addb.absolutdrinks.com/drinks/" + drinkSelected.toLowerCase() + "/?apiKey=24a49938d9c64ae18a4b6fbc29d7f751";
-
-
-    console.log(queryURL);
-
-    $.ajax({
-        url: "https://cors-anywhere.herokuapp.com/" + queryURL,
-        method: "GET"
-    })
-
-    .done(function(response) {
-        console.log(response);
-        var ingredient_list = response.result[0].ingredients;
-        console.log(ingredient_list);
-
-        for (var i = 0; i < ingredient_list.length; i++) {
-            $(".ingredients-list").append("<p>" + ingredient_list[i].textPlain + "</p>");
-        }
-
-        $("#instructions-area").text(response.result[0].descriptionPlain);
-    });
-
-    //code to hide "add to favorites" button
-
-    // if ($(this)==[div.favListItem]) {
-    //     $("#like-btn").hide();
-
-    // }
-    $("#myModal").modal();
-}
-
-$("#carousel-close").click(function() {
-    $("#theCarousel").hide();
-})
-
-
-
-
-
 
 
 window.onload = function() {
-
-
-    console.log('inside window onload');
-
     $("#theCarousel").hide();
     $(".modal-container").hide();
-
     $(document).on("click", ".mood-style", loadList);
-
     $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
-
-    displayFavList();
-
-    $(".dropdown").on("click", ".favListItem", displayRecipe);
-
-
+    fillAlcoholList();
+    $(".dropdown-menu").on("click", ".favListItem", displayRecipe);
+    $(document).on("click", ".alcohol", loadAlcoholList);
+    $(".btn-delete").on("click", function(){
+        removeUserLike($(this).parent().attr("data-nameOnSrc"));
+    });
 
 };
