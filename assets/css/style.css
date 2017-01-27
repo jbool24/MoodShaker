@@ -5,9 +5,16 @@
 #title {
 	font-family: 'Ubuntu', sans-serif;
 	font-size: 50px;
-	text-align: center;
 	color: #af9a51;
-	margin-left: 27%;
+	position: absolute;
+	top: 15px;
+	left: 38%;
+}
+
+.row-title {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
 
 #body-style {
@@ -64,7 +71,7 @@
     background-image: url(../images/Amazing-Cocktail-Splash-Wallpapers-HD.jpg);
 
     /* Set a specific height */
-    min-height: 500px; 
+    min-height: 600px; 
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -80,7 +87,7 @@
     background-image: url(../images/relax-in-mauritius_408.jpeg);
 
     /* Set a specific height */
-    min-height: 500px; 
+    min-height: 600px; 
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -90,7 +97,6 @@
 }
 
 #myCarousel {
-	margin-top: 50px;
 	margin-bottom: 50px;
 }
 
@@ -134,9 +140,10 @@
 	float: left;
 	width: 18%;
 	margin: 1%;
-	height: 300px;
 	border:#92831D solid 1px;
 	background-color: #000000;
+	padding: 5px;
+	padding-bottom: 10px;
 
 }
 
@@ -160,9 +167,10 @@
 	cursor: pointer;
 }
 
-p {
+h4 {
 	padding: 8px;
-	height: 20%;
+	padding-bottom: 12px;
+	height: 50px;
 	text-align: center;
 }
 
@@ -181,8 +189,12 @@ img {
 
 #like-btn {
 	background-color: #af9a51;
-	position: right-fixed;
 	color: black;
+	margin-bottom: 15px;
+}
+
+#instructions-area {
+	margin-bottom: 15px;
 }
 
 .collapse .navbar-collapse {
@@ -200,6 +212,25 @@ img {
 .navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a {
 	color: #af9a51;
 }
+
+.navbar .navbar-nav > li.open > a:hover, .navbar .navbar-nav > li.open > a:focus {
+ background-color: transparent;
+ border-radius: 5px;
+ color: #af9a51 ;
+ text-decoration: none;
+}
+.navbar-default .navbar-nav .open .dropdown-menu>li>a, .navbar-default .navbar-nav .open .dropdown-menu {
+   background-color: #af9a51 ;
+   color:#ffffff ;
+   min-width: 250px;
+   
+}
+
+#fav-tab:hover {
+    color: #af9a51 ;
+}
+
+
 .form-control {
 	background-color: #833636;
 	color: white;
@@ -246,7 +277,9 @@ button.btn.btn-default{
 	border: solid #544A0A;
 	background-color: #544A0A;
 	margin-right: 25px;
-	z-index: 1000;
+	position: absolute;
+	right: 20px;
+	top: 20px;
 }
 
 .carousel {
@@ -259,6 +292,79 @@ button.btn.btn-default{
 	background-color: none;
 }
 
-.carousel-control {
+#make-drink-section {
+	height: 400px;
+	background: rgba(0, 0, 0, 0.7);
+	text-align: center;
+	margin-bottom: 50px;
+	margin-top: 100px;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 16px;
+	color: #af9a51;
 	
 }
+
+ul {
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+	padding-top: 15px;
+}
+
+.alcohol {
+	background-color: #000000;
+	padding-top: 8px;
+	margin: 4px;
+	height: 40px;
+	vertical-align: middle;
+	border-radius: 5px;
+	border: solid #544A0A 1px;
+	cursor: pointer;
+}
+
+.alcohol:hover {
+    box-shadow: 0px 0px 5px #af9a51;
+}
+
+.shaker {
+	width: 200px;
+	margin-top: 10px;
+}
+
+.plus {
+	width: 50px;
+	height: 50px;
+	position: relative;
+	margin: 100px 70px 0px 0px;
+}
+
+.plus-right {
+	width: 50px;
+	height: 50px;
+	margin: 100px 0px 0px 50px;
+	position: relative;
+}
+
+.hor-line {
+	width: 50px;
+	height: 2px;
+	background-color: #af9a51;
+	position: absolute;
+	top: 24px;
+}
+
+.vert-line {
+	width: 2px;
+	height: 50px;
+	background-color: #af9a51;
+	position: absolute;
+	left: 40px;
+}
+
+#make-drink-title {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 25px;
+	color: #af9a51;
+	margin-top: 25px;
+}
+

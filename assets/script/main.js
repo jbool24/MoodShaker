@@ -141,6 +141,31 @@ function removeUserLike(like_id) { //----------------------------------------- F
     }
 }
 
+function displayFavList() {
+    console.log("inside fav list");
+    var user = firebase.auth().currentUser;
+    console.log(user);
+    var likesCollection = database.ref("users/" + user.uid + "/likes");
+    if (user) {
+        database.ref("users/" + user.uid).child("likes").on("child_added", function(snap) {
+            console.log(snap.val().recipe_id);
+            //<li><a href="#">HTML</a></li>
+            var newLiItem = $("<li>");
+            var newDiv = $("<div>");
+            newDiv.addClass("favListItem");
+            newDiv.attr("data-nameOnSrc", snap.val().recipe_id);
+            newDiv.attr("data-drink-name", snap.val().recipe_id.replace(/-/g, " "));
+            newDiv.text(snap.val().recipe_id.replace(/-/g, " "));
+            newLiItem.append(newDiv);
+            $(".dropdown-menu").append(newLiItem);
+
+        }); //ID GOES HERE;
+
+    }
+
+
+}
+
 //TODO Identify Likes and map to cards
 
 //==========  Event Listeners  =======================
@@ -231,6 +256,7 @@ function playSong(song) {
     player.play();
 }
 
+
 function stopSong() {
     player.pause()
 }
@@ -276,7 +302,7 @@ function loadList() {
         inactiveDiv.addClass("item");
         $(".carousel-inner").append(inactiveDiv);
 
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 10; i++) {
             var name = response.result[i].name;
             newDiv = $("<div>");
             // newDiv.addClass("col-md-2 cocktailList");
@@ -284,27 +310,18 @@ function loadList() {
             newDiv.attr("id", "cocktailID");
 
             newDiv.attr("data-drink-name", name);
-            newDiv.append("<p>" + name + "</p>");
+            newDiv.append("<h4>" + name + "</h4>");
             nameOnSrc = name.replace(/ /g, '-');
             newDiv.attr("data-nameOnSrc", nameOnSrc);
             newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-            $(activeDiv).append(newDiv);
+            if (i > 4){
+                $(inactiveDiv).append(newDiv);
+            } else {
+                $(activeDiv).append(newDiv);
+            }
+
         }
 
-        for (var i = 5; i < 10; i++) {
-            var name = response.result[i].name;
-            newDiv = $("<div>");
-            // newDiv.addClass("col-md-2 cocktailList");
-            newDiv.addClass("item-style cocktailList");
-            newDiv.attr("id", "cocktailID");
-
-            newDiv.attr("data-drink-name", name);
-            newDiv.append("<p>" + name + "</p>");
-            nameOnSrc = name.replace(/ /g, '-');
-            newDiv.attr("data-nameOnSrc", nameOnSrc);
-            newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
-            $(inactiveDiv).append(newDiv);
-        }
 
     });
 
@@ -319,8 +336,8 @@ $(".carousel-control").on("click", function() {
 
 // function to display the recipe once a drink is selected..
 function displayRecipe() {
-    console.log("he");
-    //$('#myModal').modal('show');
+
+    console.log("inside display recipe")
 
     $(".modal-container").show();
     console.log($(this));
@@ -350,6 +367,7 @@ function displayRecipe() {
 
         $("#instructions-area").text(response.result[0].descriptionPlain);
     });
+
     $("#myModal").modal();
 }
 
@@ -359,12 +377,22 @@ $("#carousel-close").click(function() {
 
 
 
+
 window.onload = function() {
 
     console.log('hi');
 
-    $(document).on("click", ".mood-style", loadList);
+
     $("#theCarousel").hide();
     $(".modal-container").hide();
+
+    $(document).on("click", ".mood-style", loadList);
+
     $(".carousel-inner").on("click", ".cocktailList", displayRecipe);
+
+    displayFavList();
+
+    $(".dropdown").on("click", ".favListItem", displayRecipe);
+
+
 };
