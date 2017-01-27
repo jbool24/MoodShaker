@@ -24,7 +24,7 @@ function signUserIn() {
 
             var userRef = database.ref("users/" + user.uid);
             existingUser(user.uid, function(isexisting) {
-
+                console.log("existingUser fires")
                 if (isexisting) {
 
                     //-----update handle to authenticated users data
@@ -43,10 +43,11 @@ function signUserIn() {
                         email: user.email
                     });
                 }
+                displayFavList();
             });
         }
 
-        displayFavList();
+
 
     }).catch(function(error) {
         // Handle Errors here.
@@ -64,7 +65,7 @@ function signUserIn() {
 function signUserOut() {
 
 
-   
+
     if (firebase.auth().currentUser !== null) {
         firebase.auth().signOut()
             .then(function() {
@@ -133,7 +134,8 @@ function removeUserLike(like_id) { //----------------------------------------- F
     if (user !== null) {
         likes.on("child_added", function(snap) {
             if (snap.val().recipe_id === like_id) {
-                console.log('removing ' + snap.val().recipe_id)
+                console.log('removing ' + snap.val().recipe_id)  
+
                 snap.ref.remove();
             }
         });
@@ -144,17 +146,24 @@ function removeUserLike(like_id) { //----------------------------------------- F
 }
 
 function displayFavList() {
+    console.log("displayFavList called");
     var user = firebase.auth().currentUser;
     var likesCollection = database.ref("users/" + user.uid + "/likes");
     if (user) {
         database.ref("users/" + user.uid).child("likes").on("child_added", function(snap) {
             var newLiItem = $("<li>");
-            var newDiv = $("<a>");
-            newDiv.addClass("favListItem favorite-cocktails");
-            newDiv.attr("data-nameOnSrc", snap.val().recipe_id);
-            newDiv.attr("data-drink-name", snap.val().recipe_id.replace(/-/g, " "));
-            newDiv.html("<h5 style='display:inline-block;'>" + snap.val().recipe_id.replace(/-/g, " ") + "</h5><p class='btn-delete'> X </p>");
-            newLiItem.append(newDiv);
+            var newLink = $("<a>");
+            var newDrink=$("<h5>");
+            newDrink.css("display","inline-block");
+            newLink.css("display","inline-block");
+            newLink.addClass("favorite-cocktails");
+            newDrink.addClass("favListItem");
+            newDrink.attr("data-nameOnSrc", snap.val().recipe_id);
+            newDrink.attr("data-drink-name", snap.val().recipe_id.replace(/-/g, " "));
+            newDrink.text(snap.val().recipe_id.replace(/-/g, " "));
+            newLink.append(newDrink);    
+            newLink.append("<p class='btn-delete' style='display:inline-block;float:right;' data-nameOnSrc='" + snap.val().recipe_id + "'> X </p>");
+            newLiItem.append(newLink);
             $(".dropdown-menu").append(newLiItem)
         });
     }
@@ -225,7 +234,7 @@ function getSong(mood) {
             var data = response.results[0];
             var tracks = data.tracks;
             var randomPlay = Math.floor(Math.random() * tracks.length)
-            //blow away old songs
+                //blow away old songs
             songs = [];
 
             for (t in tracks) {
@@ -312,7 +321,7 @@ $(".carousel-control").on("click", function() {
 
 // function to display the recipe once a drink is selected..
 function displayRecipe() {
-
+    $("#like-btn").show();
     $(".modal-container").show();
     $("#cocktail-name").html($(this).attr("data-drink-name"));
     $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
@@ -332,13 +341,15 @@ function displayRecipe() {
 
 
     //code to hide "add to favorites" button
+
+    if ($(this).hasClass("favListItem")) {
+        $("#like-btn").hide();
+
+    }
    
-    if ($(this).hasClass("favListItem")){
-         $("#like-btn").hide();         
+        $("#myModal").modal();
 
-     }
-
-    $("#myModal").modal();
+    
 }
 
 $("#carousel-close").click(function() {
@@ -420,7 +431,9 @@ window.onload = function() {
     fillAlcoholList();
     $(".dropdown-menu").on("click", ".favListItem", displayRecipe);
     $(document).on("click", ".alcohol", loadAlcoholList);
-    $(".btn-delete").on("click", function(){
-        removeUserLike($(this).parent().attr("data-nameOnSrc"));
+    $(document).on("click", ".btn-delete", function() {
+        console.log("remove clicked");
+        $(this).parent().hide();
+        removeUserLike($(this).attr("data-nameOnSrc"));
     });
 };
