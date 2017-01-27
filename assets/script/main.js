@@ -14,14 +14,9 @@ var userData; // global handle for authenticated user data
 
 //=============== AUTHENTICATION =========================
 // var provider = ;
-function signIn() {
+function signUserIn() {
     firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).then(function(result) {
         const user = result.user;
-
-        // console.log("=================")
-        // console.log(firebase.auth().currentUser)
-        // console.log("=================")
-        // console.log(user)
 
         // If user authenticated correctly check if they already have data
         // in storage otherwise create new userData domain for the user.
@@ -31,7 +26,6 @@ function signIn() {
             existingUser(user.uid, function(isexisting) {
 
                 if (isexisting) {
-                    console.log(user.uid)
 
                     //-----update handle to authenticated users data
                     userRef.once("value").then(function(snap) {
@@ -50,9 +44,7 @@ function signIn() {
                     });
                 }
             });
-
         }
-
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -64,17 +56,18 @@ function signIn() {
         console.log(errorCode, errorMessage, email, credential)
     }); //======== End Authentication =================
 }
-signIn(); // Call on page load
+signUserIn(); // Call on page load
 
 function signUserOut() {
 
     console.log("Sign-Out Called");
 
-    if (user) {
+    if (firebase.auth().currentUser !== null) {
         firebase.auth().signOut()
             .then(function() {
                 // Sign-out successful.
-                // Reset UserData
+                // Reset UserData to empty object
+                $("button.sign-in-btn").text("Sign In");
                 userData = {};
 
             }, function(error) {
@@ -83,11 +76,9 @@ function signUserOut() {
 
                 // An error happened.
                 alert("Logout Unsuccessful")
-                $("button.sign-in-btn").text(firstName[0] + " , sign out?").show();
+                $("button.sign-in-btn").text(firstName[0] + " , sign out?");
             });
 
-    } else {
-        signIn();
     }
 
 }
@@ -105,7 +96,6 @@ function existingUser(userID, callback) {
         .once("value")
         .then(function(snapshot) {
             var exists = (snapshot.val() !== null);
-            console.log(exists);
             callback(exists);
         })
         .catch(function(error) {
@@ -126,23 +116,25 @@ function existingUser(userID, callback) {
 
 
 function addUserLike(recipe_id) {
-    var user = firebase.auth().currentUser
-    var likesCollection = database.ref("users/" + user.uid + "/likes")
-    if (user) {
-        likesCollection.push({
-            //GET CURRENT ACTIVE RECIPE ID and add to collection
-            recipe_id: recipe_id //ID GOES HERE; Query name to pass to the absoluteDrinksAPI
-        });
-    }
+    var user = firebase.auth().currentUser;
+    var likesCollection = database.ref("users/" + user.uid + "/likes");
+    likesCollection.push({
+        //GET CURRENT ACTIVE RECIPE ID and add to collection
+        recipe_id: recipe_id
+    });
 
 }
 
 function removeUserLike(like_id) { //----------------------------------------- FIXME
-    var user = firebase.auth().currentUser
-    if (user) {
-        database.ref("users/" + user.uid).child("likes").equalTo(like_id).once("value", function(snap) {
-            snap.ref().remove();
-        }); //ID GOES HERE;
+    var user = firebase.auth().currentUser;
+    var likes = database.ref("users/" + user.uid + "/likes");
+    if (user !== null) {
+        likes.on("child_added", function(snap) {
+            if (snap.val().recipe_id === like_id) {
+                console.log('removing ' + snap.val().recipe_id)
+                snap.ref.remove();
+            }
+        });
 
     } else {
         alert("No user logged in.");
@@ -181,12 +173,18 @@ function displayFavList() {
 $(document).ready(function() {
 
     //-- Attach clickListener to signout button
-    $("button.sign-in-btn").on("click", signUserOut);
+    $("button.sign-in-btn").on("click", function() {
+        if (firebase.auth().currentUser !== null) {
+            signUserOut();
+        } else {
+            signUserIn();
+        }
+    });
 
     //-- Like button clickListene
     $(document).on("click", "#like-btn", function() {
         console.log($(this))
-        addUserLike(drinkSelected)
+        addUserLike(drinkSelected);
     });
 
     //--
@@ -200,16 +198,17 @@ $(document).ready(function() {
         if (user) {
             const fullName = firebase.auth().currentUser.displayName;
             const firstName = fullName.split(" ");
-            $("button.sign-in-btn").text(firstName[0] + ", sign out?").show();
+            $("button.sign-in-btn").text(firstName[0] + ", sign out?");
             // $("button#btn-signOut").show();
         } else {
-            $("button.sign-in-btn").text("Sign in").show();
+            $("button.sign-in-btn").text("Sign in");
         }
     });
 
-}); //=================== End Event listenters
-
+});
 //================ End Database Code =================
+
+
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
 var moodSelected, drinkSelected;
@@ -257,6 +256,7 @@ function playSong(song) {
     player.play();
 }
 
+
 function stopSong() {
     player.pause()
 }
@@ -271,7 +271,7 @@ function nextSong() {
     playSong(next);
     console.log(count);
 }
-//function that loads the list of cocktails as per the moods clicked.. 
+//function that loads the list of cocktails as per the moods clicked..
 function loadList() {
     $("#theCarousel").show();
 
@@ -317,9 +317,9 @@ function loadList() {
             if (i > 4){
                 $(inactiveDiv).append(newDiv);
             } else {
-                $(activeDiv).append(newDiv);    
+                $(activeDiv).append(newDiv);
             }
-            
+
         }
 
 
@@ -338,6 +338,7 @@ $(".carousel-control").on("click", function() {
 function displayRecipe() {
 
     console.log("inside display recipe")
+
     $(".modal-container").show();
     console.log($(this));
     //jQuery.noConflict();
@@ -367,12 +368,6 @@ function displayRecipe() {
         $("#instructions-area").text(response.result[0].descriptionPlain);
     });
 
-    //code to hide "add to favorites" button
-
-    // if ($(this)==[div.favListItem]) {
-    //     $("#like-btn").hide();
-
-    // }
     $("#myModal").modal();
 }
 
@@ -383,13 +378,10 @@ $("#carousel-close").click(function() {
 
 
 
-
-
-
 window.onload = function() {
 
+    console.log('hi');
 
-    console.log('inside window onload');
 
     $("#theCarousel").hide();
     $(".modal-container").hide();
@@ -401,7 +393,6 @@ window.onload = function() {
     displayFavList();
 
     $(".dropdown").on("click", ".favListItem", displayRecipe);
-
 
 
 };
