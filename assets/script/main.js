@@ -14,7 +14,7 @@ var userData; // global handle for authenticated user data
 
 //=============== AUTHENTICATION =========================
 // var provider = ;
-function signIn() {
+function signUserIn() {
     firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).then(function(result) {
         const user = result.user;
 
@@ -26,6 +26,7 @@ function signIn() {
             existingUser(user.uid, function(isexisting) {
 
                 if (isexisting) {
+
                     //-----update handle to authenticated users data
                     userRef.once("value").then(function(snap) {
                         userData = snap.val();
@@ -43,9 +44,10 @@ function signIn() {
                     });
                 }
             });
-
         }
+
         displayFavList();
+
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -57,14 +59,18 @@ function signIn() {
         console.log(errorCode, errorMessage, email, credential)
     }); //======== End Authentication =================
 }
-signIn(); // Call on page load
+
 
 function signUserOut() {
-    if (user) {
+
+
+   
+    if (firebase.auth().currentUser !== null) {
         firebase.auth().signOut()
             .then(function() {
                 // Sign-out successful.
-                // Reset UserData
+                // Reset UserData to empty object
+                $("button.sign-in-btn").text("Sign In");
                 userData = {};
 
             }, function(error) {
@@ -73,11 +79,9 @@ function signUserOut() {
 
                 // An error happened.
                 alert("Logout Unsuccessful")
-                $("button.sign-in-btn").text(firstName[0] + " , sign out?").show();
+                $("button.sign-in-btn").text(firstName[0] + " , sign out?");
             });
 
-    } else {
-        signIn();
     }
 
 }
@@ -95,7 +99,6 @@ function existingUser(userID, callback) {
         .once("value")
         .then(function(snapshot) {
             var exists = (snapshot.val() !== null);
-            console.log(exists);
             callback(exists);
         })
         .catch(function(error) {
@@ -114,22 +117,25 @@ function existingUser(userID, callback) {
 //==========  Database Functions =====================
 
 function addUserLike(recipe_id) {
-    var user = firebase.auth().currentUser
-    var likesCollection = database.ref("users/" + user.uid + "/likes")
-    if (user) {
-        likesCollection.push({
-            //GET CURRENT ACTIVE RECIPE ID and add to collection
-            recipe_id: recipe_id //ID GOES HERE; Query name to pass to the absoluteDrinksAPI
-        });
-    }
+    var user = firebase.auth().currentUser;
+    var likesCollection = database.ref("users/" + user.uid + "/likes");
+    likesCollection.push({
+        //GET CURRENT ACTIVE RECIPE ID and add to collection
+        recipe_id: recipe_id
+    });
 
 }
 
-function removeUserLike(like_id) {
-    var user = firebase.auth().currentUser
-    if (user) {
-        database.ref("users/" + user.uid).child("likes").equalTo(like_id).once("value", function(snap) {
-            snap.ref().remove();
+
+function removeUserLike(like_id) { //----------------------------------------- FIXME
+    var user = firebase.auth().currentUser;
+    var likes = database.ref("users/" + user.uid + "/likes");
+    if (user !== null) {
+        likes.on("child_added", function(snap) {
+            if (snap.val().recipe_id === like_id) {
+                console.log('removing ' + snap.val().recipe_id)
+                snap.ref.remove();
+            }
         });
 
     } else {
@@ -160,12 +166,18 @@ function displayFavList() {
 // On Document Ready
 $(document).ready(function() {
     //-- Attach clickListener to signout button
-    $("button.sign-in-btn").on("click", signUserOut);
+    $("button.sign-in-btn").on("click", function() {
+        if (firebase.auth().currentUser !== null) {
+            signUserOut();
+        } else {
+            signUserIn();
+        }
+    });
 
     //-- Like button clickListene
     $(document).on("click", "#like-btn", function() {
         console.log($(this))
-        addUserLike(drinkSelected)
+        addUserLike(drinkSelected);
     });
 
     //-- Watch for user signOut then hide the signout button
@@ -173,16 +185,17 @@ $(document).ready(function() {
         if (user) {
             const fullName = firebase.auth().currentUser.displayName;
             const firstName = fullName.split(" ");
-            $("button.sign-in-btn").text(firstName[0] + ", sign out?").show();
+            $("button.sign-in-btn").text(firstName[0] + ", sign out?");
             // $("button#btn-signOut").show();
         } else {
-            $("button.sign-in-btn").text("Sign in").show();
+            $("button.sign-in-btn").text("Sign in");
         }
     });
 
-}); //=================== End Event listenters
-
+});
 //================ End Database Code =================
+
+
 //================ Absolute API CODE =================
 var moodList = ["party", "romantic", "relax", "cry"];
 var alcoholList = ["Rum", "Vodka", "Whisky", "Gin", "Brandy", "Tequila"];
@@ -211,7 +224,7 @@ function getSong(mood) {
         .done(function(response) {
             var data = response.results[0];
             var tracks = data.tracks;
-
+            var randomPlay = Math.floor(Math.random() * tracks.length)
             //blow away old songs
             songs = [];
 
@@ -220,7 +233,8 @@ function getSong(mood) {
             }
 
             console.log(songs);
-            playSong(songs[0]);
+            console.log(randomPlay);
+            playSong(songs[randomPlay]);
         });
 }
 
@@ -230,6 +244,7 @@ function playSong(song) {
     player.setAttribute("src", song);
     player.play();
 }
+
 
 function stopSong() {
     player.pause()
@@ -245,7 +260,7 @@ function nextSong() {
     playSong(next);
     console.log(count);
 }
-//function that loads the list of cocktails as per the moods clicked.. 
+//function that loads the list of cocktails as per the moods clicked..
 function loadList() {
     $("#theCarousel").show();
 
@@ -283,6 +298,7 @@ function loadList() {
             } else {
                 $(activeDiv).append(newDiv);
             }
+
         }
     });
     getSong(moodSelected);
@@ -296,6 +312,7 @@ $(".carousel-control").on("click", function() {
 
 // function to display the recipe once a drink is selected..
 function displayRecipe() {
+
     $(".modal-container").show();
     $("#cocktail-name").html($(this).attr("data-drink-name"));
     $("#image-holder").attr("src", "http://assets.absolutdrinks.com/drinks/145x200/" + $(this).attr("data-nameOnSrc") + ".jpg");
@@ -313,12 +330,14 @@ function displayRecipe() {
         $("#instructions-area").text(response.result[0].descriptionPlain);
     });
 
+
     //code to hide "add to favorites" button
    
     if ($(this).hasClass("favListItem")){
          $("#like-btn").hide();         
 
      }
+
     $("#myModal").modal();
 }
 
@@ -342,9 +361,6 @@ function fillAlcoholList() {
 
 
 }
-
-
-
 
 
 function loadAlcoholList() {
@@ -395,6 +411,7 @@ function loadAlcoholList() {
 }
 
 
+
 window.onload = function() {
     $("#theCarousel").hide();
     $(".modal-container").hide();
@@ -406,5 +423,4 @@ window.onload = function() {
     $(".btn-delete").on("click", function(){
         removeUserLike($(this).parent().attr("data-nameOnSrc"));
     });
-
 };
