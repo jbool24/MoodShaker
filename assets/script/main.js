@@ -116,23 +116,25 @@ function existingUser(userID, callback) {
 
 
 function addUserLike(recipe_id) {
-    var user = firebase.auth().currentUser
-    var likesCollection = database.ref("users/" + user.uid + "/likes")
-    if (user) {
-        likesCollection.push({
-            //GET CURRENT ACTIVE RECIPE ID and add to collection
-            recipe_id: recipe_id //ID GOES HERE; Query name to pass to the absoluteDrinksAPI
-        });
-    }
+    var user = firebase.auth().currentUser;
+    var likesCollection = database.ref("users/" + user.uid + "/likes");
+    likesCollection.push({
+        //GET CURRENT ACTIVE RECIPE ID and add to collection
+        recipe_id: recipe_id
+    });
 
 }
 
 function removeUserLike(like_id) { //----------------------------------------- FIXME
-    var user = firebase.auth().currentUser
-    if (user) {
-        database.ref("users/" + user.uid).child("likes").equalTo(like_id).once("value", function(snap) {
-            snap.ref().remove();
-        }); //ID GOES HERE;
+    var user = firebase.auth().currentUser;
+    var likes = database.ref("users/" + user.uid + "/likes");
+    if (user !== null) {
+        likes.on("child_added", function(snap) {
+            if (snap.val().recipe_id === like_id) {
+                console.log('removing ' + snap.val().recipe_id)
+                snap.ref.remove();
+            }
+        });
 
     } else {
         alert("No user logged in.");
@@ -171,10 +173,10 @@ $(document).ready(function() {
         if (user) {
             const fullName = firebase.auth().currentUser.displayName;
             const firstName = fullName.split(" ");
-            $("button.sign-in-btn").text(firstName[0] + ", sign out?").show();
+            $("button.sign-in-btn").text(firstName[0] + ", sign out?");
             // $("button#btn-signOut").show();
         } else {
-            $("button.sign-in-btn").text("Sign in").show();
+            $("button.sign-in-btn").text("Sign in");
         }
     });
 
