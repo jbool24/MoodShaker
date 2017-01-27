@@ -248,8 +248,29 @@ function getSong(mood) {
     }
     //function that loads the list of cocktails as per the moods clicked.. 
     function loadList() {
+		
 		$("#theCarousel").show();
+		console.log (this.hash);
+		
+			if (this.hash !== "") {
+		  // Prevent default anchor click behavior
+		  event.preventDefault();
+
+		  // Store hash
+		  var hash = this.hash;
+
+		  // Using jQuery's animate() method to add smooth page scroll
+		  // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+		  $('html, body').animate({
+			scrollTop: $(hash).offset().top
+		  }, 800, function(){
+
+			// Add hash (#) to URL when done scrolling (default click behavior)
 			
+		  });
+		} // End if
+				
+		
         $(activeDiv).empty();
         $(activeDiv).removeClass("item active");
         $(inactiveDiv).empty();
@@ -306,11 +327,12 @@ function getSong(mood) {
                         newDiv.append("<img src=http://assets.absolutdrinks.com/drinks/200x200/" + nameOnSrc + ".jpg>");
                         $(inactiveDiv).append(newDiv);
                         } 
-
+				
         });
-        
-        getSong(moodSelected);  
-    }
+				
+	}
+	   getSong(moodSelected);  
+   
             
             $(".carousel-control").on("click", function(){
                 activeDiv.toggleClass(inactiveDiv);
@@ -361,7 +383,6 @@ function getSong(mood) {
 
 
 window.onload = function() {
-
 
             console.log('hi');
 			
