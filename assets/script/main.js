@@ -56,7 +56,7 @@ function signUserIn() {
         console.log(errorCode, errorMessage, email, credential)
     }); //======== End Authentication =================
 }
-signUserIn(); // Call on page load
+
 
 function signUserOut() {
 
