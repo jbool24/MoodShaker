@@ -236,7 +236,7 @@ function getSong(mood) {
         .done(function(response) {
             var data = response.results[0];
             var tracks = data.tracks;
-
+            var randomPlay = Math.floor(Math.random() * tracks.length)
             //blow away old songs
             songs = [];
 
@@ -245,7 +245,8 @@ function getSong(mood) {
             }
             // console.log(data, tracks);
             console.log(songs);
-            playSong(songs[0]);
+            console.log(randomPlay);
+            playSong(songs[randomPlay]);
         });
 }
 
