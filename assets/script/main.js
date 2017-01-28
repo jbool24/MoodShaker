@@ -134,7 +134,7 @@ function removeUserLike(like_id) { //----------------------------------------- F
     if (user !== null) {
         likes.on("child_added", function(snap) {
             if (snap.val().recipe_id === like_id) {
-                console.log('removing ' + snap.val().recipe_id)  
+                console.log('removing ' + snap.val().recipe_id)
 
                 snap.ref.remove();
             }
@@ -153,15 +153,15 @@ function displayFavList() {
         database.ref("users/" + user.uid).child("likes").on("child_added", function(snap) {
             var newLiItem = $("<li>");
             var newLink = $("<a>");
-            var newDrink=$("<h5>");
-            newDrink.css("display","inline-block");
-            newLink.css("display","inline-block");
+            var newDrink = $("<h5>");
+            newDrink.css("display", "inline-block");
+            newLink.css("display", "inline-block");
             newLink.addClass("favorite-cocktails");
             newDrink.addClass("favListItem");
             newDrink.attr("data-nameOnSrc", snap.val().recipe_id);
             newDrink.attr("data-drink-name", snap.val().recipe_id.replace(/-/g, " "));
             newDrink.text(snap.val().recipe_id.replace(/-/g, " "));
-            newLink.append(newDrink);    
+            newLink.append(newDrink);
             newLink.append("<p class='btn-delete' style='display:inline-block;float:right;' data-nameOnSrc='" + snap.val().recipe_id + "'> X </p>");
             newLiItem.append(newLink);
             $(".dropdown-menu").append(newLiItem)
@@ -272,25 +272,25 @@ function nextSong() {
 //function that loads the list of cocktails as per the moods clicked..
 function loadList() {
     $("#theCarousel").show();
-    console.log (this.hash);
-            
-                if (this.hash !== "") {
-              // Prevent default anchor click behavior
-              event.preventDefault();
+    console.log(this.hash);
 
-              // Store hash
-              var hash = this.hash;
+    if (this.hash !== "") {
+        // Prevent default anchor click behavior
+        event.preventDefault();
 
-              // Using jQuery's animate() method to add smooth page scroll
-              // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
-              $('html, body').animate({
-                scrollTop: $(hash).offset().top
-              }, 800, function(){
+        // Store hash
+        var hash = this.hash;
 
-                // Add hash (#) to URL when done scrolling (default click behavior)
-                
-              });
-            } // End if
+        // Using jQuery's animate() method to add smooth page scroll
+        // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+        $('html, body').animate({
+            scrollTop: $(hash).offset().top
+        }, 800, function() {
+
+            // Add hash (#) to URL when done scrolling (default click behavior)
+
+        });
+    } // End if
 
     $(activeDiv).empty();
     $(activeDiv).removeClass("item active");
@@ -366,10 +366,10 @@ function displayRecipe() {
         $("#like-btn").hide();
 
     }
-   
-        $("#myModal").modal();
 
-    
+    $("#myModal").modal();
+
+
 }
 
 $("#carousel-close").click(function() {
@@ -390,6 +390,7 @@ function fillAlcoholList() {
 
         $("#alcohol-list").append(newLink);
     }
+}
 
 
 function loadAlcoholList() {
@@ -456,4 +457,4 @@ window.onload = function() {
         removeUserLike($(this).attr("data-nameOnSrc"));
     });
 
-};
+}
