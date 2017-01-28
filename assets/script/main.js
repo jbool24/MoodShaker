@@ -272,6 +272,25 @@ function nextSong() {
 //function that loads the list of cocktails as per the moods clicked..
 function loadList() {
     $("#theCarousel").show();
+    console.log (this.hash);
+            
+                if (this.hash !== "") {
+              // Prevent default anchor click behavior
+              event.preventDefault();
+
+              // Store hash
+              var hash = this.hash;
+
+              // Using jQuery's animate() method to add smooth page scroll
+              // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+              $('html, body').animate({
+                scrollTop: $(hash).offset().top
+              }, 800, function(){
+
+                // Add hash (#) to URL when done scrolling (default click behavior)
+                
+              });
+            } // End if
 
     $(activeDiv).empty();
     $(activeDiv).removeClass("item active");
@@ -309,6 +328,7 @@ function loadList() {
             }
 
         }
+
     });
     getSong(moodSelected);
 }
@@ -356,6 +376,7 @@ $("#carousel-close").click(function() {
     $("#theCarousel").hide();
 })
 
+
 function fillAlcoholList() {
     //<li><a href="#">Vodka</a></li>
     console.log("inside alcohol list");
@@ -369,9 +390,6 @@ function fillAlcoholList() {
 
         $("#alcohol-list").append(newLink);
     }
-
-
-}
 
 
 function loadAlcoholList() {
@@ -423,6 +441,7 @@ function loadAlcoholList() {
 
 
 
+
 window.onload = function() {
     $("#theCarousel").hide();
     $(".modal-container").hide();
@@ -436,4 +455,5 @@ window.onload = function() {
         $(this).parent().hide();
         removeUserLike($(this).attr("data-nameOnSrc"));
     });
+
 };
