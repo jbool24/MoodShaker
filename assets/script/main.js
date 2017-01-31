@@ -24,7 +24,7 @@ function signUserIn() {
 
             var userRef = database.ref("users/" + user.uid);
             existingUser(user.uid, function(isexisting) {
-                console.log("existingUser fires")
+
                 if (isexisting) {
 
                     //-----update handle to authenticated users data
@@ -128,7 +128,7 @@ function addUserLike(recipe_id) {
 }
 
 
-function removeUserLike(like_id) { //----------------------------------------- FIXME
+function removeUserLike(like_id) {
     var user = firebase.auth().currentUser;
     var likes = database.ref("users/" + user.uid + "/likes");
     if (user !== null) {
@@ -146,7 +146,6 @@ function removeUserLike(like_id) { //----------------------------------------- F
 }
 
 function displayFavList() {
-    console.log("displayFavList called");
     var user = firebase.auth().currentUser;
     var likesCollection = database.ref("users/" + user.uid + "/likes");
     if (user) {
@@ -169,8 +168,6 @@ function displayFavList() {
     }
 }
 
-//TODO Identify Likes and map to cards
-
 //==========  Event Listeners  =======================
 // On Document Ready
 $(document).ready(function() {
@@ -185,7 +182,6 @@ $(document).ready(function() {
 
     //-- Like button clickListene
     $(document).on("click", "#like-btn", function() {
-        console.log($(this))
         addUserLike(drinkSelected);
     });
 
@@ -241,8 +237,6 @@ function getSong(mood) {
                 songs.push(tracks[t].audio);
             }
 
-            console.log(songs);
-            console.log(randomPlay);
             playSong(songs[randomPlay]);
         });
 }
@@ -265,14 +259,13 @@ function nextSong() {
         count = 0;
     }
     let next = songs[count];
-    console.log(next);
+
     playSong(next);
-    console.log(count);
+
 }
 //function that loads the list of cocktails as per the moods clicked..
 function loadList() {
     $("#theCarousel").show();
-    console.log(this.hash);
 
     if (this.hash !== "") {
         // Prevent default anchor click behavior
@@ -378,8 +371,6 @@ $("#carousel-close").click(function() {
 
 
 function fillAlcoholList() {
-    //<li><a href="#">Vodka</a></li>
-    console.log("inside alcohol list");
     for (var i = 0; i < alcoholList.length; i++) {
         var newLink = $("<li>");
 
@@ -452,7 +443,6 @@ window.onload = function() {
     $(".dropdown-menu").on("click", ".favListItem", displayRecipe);
     $(document).on("click", ".alcohol", loadAlcoholList);
     $(document).on("click", ".btn-delete", function() {
-        console.log("remove clicked");
         $(this).parent().hide();
         removeUserLike($(this).attr("data-nameOnSrc"));
     });
