@@ -224,7 +224,7 @@ var count = songs.length;
 function getSong(mood) {
     var format = "json";
     var moodName = mood;
-    var client_id = "56d30c95";
+    var client_id = "ac07738a";
 
     $.ajax({
             url: "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=" + client_id + "&format=json&limit=5&name=" + moodName,
